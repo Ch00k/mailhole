@@ -1,0 +1,12 @@
+Source: mailhole
+Section: network
+Priority: optional
+Maintainer: Andriy Yurchuk <ayurchuk@minuteware.net>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.40
+Homepage: https://github.com/Ch00k//mailhole
+
+Package: mailhole
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: mailhole package

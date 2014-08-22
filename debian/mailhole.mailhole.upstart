@@ -1,0 +1,12 @@
+description "mailhole"
+author "Andriy Yurchuk <ayurchuk@minuteware.net>"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+exec start-stop-daemon --start \
+            --name mailhole \
+            --exec /usr/bin/mailhole.py
+
