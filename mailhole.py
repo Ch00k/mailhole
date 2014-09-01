@@ -2,7 +2,6 @@
 
 
 import asyncore
-import base64
 import ConfigParser
 import email
 import json
@@ -37,15 +36,40 @@ class MailHoleSMTP(SMTPServer):
 
     def process_message(self, peer, mailfrom, rcpttos, data):
         msg = email.message_from_string(data)
-        original_subject = msg.get('Subject')
-        subject = original_subject.replace(' ', '_').lower()
-        mail_file = '{}__{}'.format(subject, '_'.join(rcpttos))
-        body = base64.b64decode(msg.get_payload()[0].get_payload())
-        mail_data = {'from': mailfrom, 'to': rcpttos,
-                     'subject': original_subject, 'body': body}
+        subject = self.compile_subject(msg)
+        body = self.get_body(msg)
+        headers = self.get_headers(msg)
+        mail_data = {
+            'from': mailfrom, 'to': rcpttos, 'subject': headers['Subject'],
+            'headers': headers, 'body': body
+        }
         log.debug(mail_data)
+        mail_file = '{}__{}'.format(subject, '_'.join(rcpttos)).lower()
         with open('{}/{}'.format(MAIL_DIR, mail_file), 'w') as f:
             f.write(json.dumps(mail_data))
+
+    def compile_subject(self, message):
+        original_subject = message.get('Subject')
+        if original_subject:
+            subject = original_subject.replace(' ', '_')
+        else:
+            subject = '__NOSUBJECT'
+        return subject
+
+    def get_headers(self, message):
+        headers = {}
+        for header in message.items():
+            headers[header[0]] = header[1]
+        return headers
+
+    def get_body(self, message):
+        body = []
+        if message.is_multipart():
+            for msg_part in message:
+                body.append(msg_part.get_payload(decode=True))
+        else:
+            body.append(message.get_payload(decode=True))
+        return body
 
 
 def run_smtp():
@@ -72,11 +96,19 @@ def run_http():
         pass
 
 
-if __name__ == '__main__':
+def main():
     http_thread = threading.Thread(target=run_http)
+    http_thread.daemon = True
     smtp_thread = threading.Thread(target=run_smtp)
+    smtp_thread.daemon = True
     http_thread.start()
     smtp_thread.start()
 
-    http_thread.join()
-    smtp_thread.join()
+    while http_thread.is_alive():
+        http_thread.join(1)
+    while smtp_thread.is_alive():
+        smtp_thread.join(1)
+
+
+if __name__ == '__main__':
+    exit(main())
