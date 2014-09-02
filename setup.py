@@ -7,7 +7,7 @@ from mailhole import __version__
 setup(
     name = 'mailhole',
     version=__version__,
-    description = 'Fake SMTP server, used for testing',
+    description = 'A simple application to test email sending functionality',
     author = 'Andriy Yurchuk',
     author_email = 'ayurchuk@minuteware.net',
     url = 'https://github.com/Ch00k/mailhole',
