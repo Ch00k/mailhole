@@ -4,4 +4,4 @@ smtp_port=1025
 http_host=localhost
 http_port=8123
 maildir=/var/lib/mailhole
-log_file=
+log_file=/var/log/mailhole.log

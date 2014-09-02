@@ -19,5 +19,4 @@ setup(
       ]
     },
     packages = ['mailhole'],
-    data_files = [('/etc/mailhole/', ['data/mailhole.conf'])]
 )
