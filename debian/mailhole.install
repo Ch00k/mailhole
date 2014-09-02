@@ -1,2 +1,2 @@
-mailhole.py usr/bin
+#mailhole/mailhole.py usr/bin
 mailhole.conf etc/mailhole
